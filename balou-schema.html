@@ -3,8 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Balou">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232d6a4f'/><text y='.9em' font-size='70' x='50%' dominant-baseline='middle' text-anchor='middle'>🐾</text></svg>">
 <title>Balou's Schema</title>
-  <!-- Versie: 2026-04-20 04:26 -->
+  <!-- Versie: 2026-04-20 04:43 -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap');
 
@@ -207,13 +211,17 @@
     pointer-events: none;
   }
 
-  /* Vuilbak knoppen */
-  .vuilbak-multi { display: contents; }
-  .task-btn.vuilbak-entry { flex-direction: column; align-items: flex-start; }
+  /* Vuilbak knoppen - altijd 4 op 1 rij */
+  .vuilbak-rij { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+  .task-btn.vuilbak-entry {
+    flex-direction: column; align-items: center; justify-content: center;
+    padding: 6px 4px; min-height: 50px; gap: 3px; text-align: center;
+  }
   .task-btn.vuilbak-todo { border-color: rgba(45,106,79,0.15); background: #fff; }
   .task-btn.vuilbak-done { background: var(--green-pale); border-color: var(--green-light); }
-  .task-btn.vuilbak-done .taak-waarde { color: var(--green); }
-  .vuilbak-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; display: inline-block; margin-right: 2px; }
+  .vuilbak-bol { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; display: block; margin: 0 auto; }
+  .vuilbak-type { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+  .vuilbak-naam { font-size: 9px; font-weight: 700; color: var(--green); }
 
   /* Opmerkingen */
   .remarks-item { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 4px; }
@@ -328,7 +336,7 @@
   .popup-cancel:hover { color: var(--amber); }
 
   /* ---- SETTINGS PAGE ---- */
-  .settings-wrap { padding: 16px; max-width: 500px; margin: 0 auto; }
+  .settings-wrap { padding: 16px; max-width: 500px; margin: 0 auto; overflow-x: hidden; }
 
   .settings-section {
     background: var(--card);
@@ -365,6 +373,7 @@
     background: #fff;
     box-sizing: border-box;
     display: block;
+    max-width: 100%;
   }
   .form-input:focus { border-color: var(--green-light); }
 
@@ -886,6 +895,15 @@ function renderMain() {
 
     const dotColors = { rest:'#6b7280', pmd:'#3b82f6', gft:'#22c55e', papier:'#ca8a04' };
 
+    // Opmerkingen bovenaan als er inhoud is
+    const rem = dayData.opmerkingen || '';
+    if (rem) {
+      html += `<div class="dag-sectie" style="background:rgba(45,106,79,0.06);border-left:3px solid var(--green-light);">
+        <div class="dag-sectie-label">📝 Opmerkingen</div>
+        <div class="remarks-readonly">${rem}</div>
+      </div>`;
+    }
+
     SECTIES.forEach(sectie => {
       const sectieTaken = activeTasks.filter(t => t.sectie === sectie.key);
       if (sectieTaken.length === 0) return;
@@ -897,19 +915,29 @@ function renderMain() {
         if (task.type === 'vuilbak') {
           const dayEntries = settings.vuilbakDates.filter(x => (x.date || x) === ds);
           const vuilbakDayData = dayData.vuilbak || {};
-          dayEntries.forEach((entry, idx) => {
-            const t = entry.type || 'rest';
+          const typeAfk = { rest:'Rest', pmd:'PMD', gft:'GFT', papier:'Paper' };
+          // Always render as grid of 4 (pad with empty if < 4)
+          const allTypes = ['rest','pmd','gft','papier'];
+          html += `<div class="vuilbak-rij">`;
+          allTypes.forEach(t => {
+            const entry = dayEntries.find(e => (e.type || 'rest') === t);
+            if (!entry) {
+              html += `<div style="min-height:50px;"></div>`;
+              return;
+            }
+            const idx = dayEntries.indexOf(entry);
             const key = `${t}_${idx}`;
             const done = vuilbakDayData[key];
             const dotColor = dotColors[t] || '#6b7280';
-            const colorClass = done ? `color-${getNameColor(done)}` : '';
-            html += `<button class="task-btn vuilbak-entry ${done ? 'vuilbak-done ' + colorClass : 'vuilbak-todo'}"
-              onclick="toggleVuilbakEntry('${ds}', '${key}', ${done ? 'true' : 'false'})"
-              style="flex-direction:row;align-items:center;gap:6px;min-height:34px;padding:5px 8px;">
-              <span style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;display:inline-block;"></span>
-              <span style="font-size:11px;font-weight:600;">${done ? done : ''}</span>
+            html += `<button class="task-btn vuilbak-entry ${done ? 'vuilbak-done' : 'vuilbak-todo'}"
+              onclick="toggleVuilbakEntry('${ds}', '${key}', ${done ? 'true' : 'false'})">
+              <span class="vuilbak-bol" style="background:${dotColor};"></span>
+              ${done
+                ? `<span class="vuilbak-naam">✓ ${done}</span>`
+                : `<span class="vuilbak-type">${typeAfk[t] || t}</span>`}
             </button>`;
           });
+          html += `</div>`;
         } else {
           const val = dayData[task.key];
           const isDone = !!val;
@@ -923,11 +951,6 @@ function renderMain() {
       });
       html += `</div></div>`;
     });
-
-    const rem = dayData.opmerkingen || '';
-    if (rem) {
-      html += `<div class="dag-sectie water"><div class="dag-sectie-label">📝 Opmerkingen</div><div class="remarks-readonly">${rem}</div></div>`;
-    }
 
     html += `</div></div>`;
     cur.setDate(cur.getDate() + 1);
