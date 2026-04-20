@@ -6,7 +6,7 @@
 <title>Balou's Schema</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap');
- 
+
   :root {
     --green: #2d6a4f;
     --green-light: #52b788;
@@ -148,15 +148,16 @@
     font-weight: 600;
   }
 
-  .day-tasks {
-    padding: 12px 16px;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-  }
-  @media (max-width: 500px) {
-    .day-tasks { grid-template-columns: repeat(2, 1fr); }
-  }
+  .day-tasks { padding: 0; }
+
+  /* Sectie styling */
+  .dag-sectie { padding: 8px 14px; border-bottom: 0.5px solid rgba(45,106,79,0.08); }
+  .dag-sectie:last-child { border-bottom: none; }
+  .dag-sectie.ochtend { background: rgba(251,191,36,0.07); border-left: 3px solid #f59e0b; }
+  .dag-sectie.avond   { background: rgba(139,92,246,0.07); border-left: 3px solid #8b5cf6; }
+  .dag-sectie.algemeen{ background: rgba(107,114,128,0.06); border-left: 3px solid #9ca3af; }
+  .dag-sectie-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
+  .taak-rij { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
   /* ---- TASK BUTTON ---- */
   .task-item { display: flex; flex-direction: column; gap: 4px; }
@@ -169,9 +170,9 @@
   }
 
   .task-btn {
-    padding: 7px 10px;
-    border-radius: 10px;
-    border: 1.5px solid rgba(45,106,79,0.2);
+    padding: 6px 10px;
+    border-radius: 9px;
+    border: 0.5px solid rgba(45,106,79,0.15);
     background: #fff;
     font-family: 'Nunito Sans', sans-serif;
     font-size: 12px;
@@ -182,24 +183,18 @@
     transition: all 0.18s;
     width: 100%;
     display: flex;
-    align-items: center;
-    gap: 5px;
-    min-height: 36px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    min-height: 42px;
   }
+  .taak-naam { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); display: flex; align-items: center; gap: 3px; opacity: 0.8; }
+  .taak-waarde { font-size: 12px; font-weight: 600; color: var(--muted); }
   .task-btn:hover { border-color: var(--green-light); background: var(--green-pale); color: var(--green); }
 
-  .task-btn.done {
-    background: var(--green-pale);
-    border-color: var(--green-light);
-    color: var(--green);
-  }
-  .task-btn.done::before {
-    content: '✓';
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--green-light);
-    flex-shrink: 0;
-  }
+  .task-btn.done { background: var(--green-pale); border-color: var(--green-light); }
+  .task-btn.done .taak-waarde { color: var(--green); }
+  .task-btn:hover { border-color: var(--green-light); background: var(--green-pale); }
 
   .task-btn.disabled {
     opacity: 0.3;
@@ -208,12 +203,12 @@
   }
 
   /* Vuilbak knoppen */
-  .vuilbak-multi { display: flex; flex-direction: column; gap: 4px; }
-  .task-btn.vuilbak-entry { font-size: 12px; min-height: 34px; }
-  .task-btn.vuilbak-todo { border-color: rgba(45,106,79,0.2); color: var(--muted); background: #fff; }
-  .task-btn.vuilbak-todo:hover { background: var(--green-pale); }
-  .task-btn.vuilbak-done { background: var(--green-pale); border-color: var(--green-light); color: var(--green); }
-  .vuilbak-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; display: inline-block; }
+  .vuilbak-multi { display: contents; }
+  .task-btn.vuilbak-entry { flex-direction: column; align-items: flex-start; }
+  .task-btn.vuilbak-todo { border-color: rgba(45,106,79,0.15); background: #fff; }
+  .task-btn.vuilbak-done { background: var(--green-pale); border-color: var(--green-light); }
+  .task-btn.vuilbak-done .taak-waarde { color: var(--green); }
+  .vuilbak-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; display: inline-block; margin-right: 2px; }
 
   /* Opmerkingen */
   .remarks-item { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 4px; }
@@ -248,18 +243,18 @@
 
 
   /* Per-name colors - 6 distinct */
-  .task-btn.done.color-0 { background: #dbeafe; border-color: #3b82f6; color: #1d4ed8; }
-  .task-btn.done.color-0::before { color: #3b82f6; }
-  .task-btn.done.color-1 { background: #dcfce7; border-color: #22c55e; color: #15803d; }
-  .task-btn.done.color-1::before { color: #22c55e; }
-  .task-btn.done.color-2 { background: #fef9c3; border-color: #eab308; color: #854d0e; }
-  .task-btn.done.color-2::before { color: #eab308; }
-  .task-btn.done.color-3 { background: #ede9fe; border-color: #8b5cf6; color: #6d28d9; }
-  .task-btn.done.color-3::before { color: #8b5cf6; }
-  .task-btn.done.color-4 { background: #ffedd5; border-color: #f97316; color: #c2410c; }
-  .task-btn.done.color-4::before { color: #f97316; }
-  .task-btn.done.color-5 { background: #ccfbf1; border-color: #14b8a6; color: #0f766e; }
-  .task-btn.done.color-5::before { color: #14b8a6; }
+  .task-btn.done.color-0 { background: #dbeafe; border-color: #3b82f6; }
+  .task-btn.done.color-0 .taak-waarde { color: #1d4ed8; }
+  .task-btn.done.color-1 { background: #dcfce7; border-color: #22c55e; }
+  .task-btn.done.color-1 .taak-waarde { color: #15803d; }
+  .task-btn.done.color-2 { background: #fef9c3; border-color: #eab308; }
+  .task-btn.done.color-2 .taak-waarde { color: #854d0e; }
+  .task-btn.done.color-3 { background: #ede9fe; border-color: #8b5cf6; }
+  .task-btn.done.color-3 .taak-waarde { color: #6d28d9; }
+  .task-btn.done.color-4 { background: #ffedd5; border-color: #f97316; }
+  .task-btn.done.color-4 .taak-waarde { color: #c2410c; }
+  .task-btn.done.color-5 { background: #ccfbf1; border-color: #14b8a6; }
+  .task-btn.done.color-5 .taak-waarde { color: #0f766e; }
 
   /* Task emoji label */
   .task-emoji { font-size: 14px; flex-shrink: 0; }
@@ -769,14 +764,19 @@ function getDayOfWeek(str) {
 function today() { return dateStr(new Date()); }
 
 const TASKS = [
-  { key: 'ochtend',       label: 'Ochtend wandeling', emoji: '🐾', always: true },
-  { key: 'ontbijt',       label: 'Ontbijt',           emoji: '🦴', always: true },
-  { key: 'avondeten',     label: 'Avondeten',          emoji: '🦴', always: true },
-  { key: 'avondwandeling',label: 'Avond wandeling',    emoji: '🐾', always: true },
-  { key: 'drinkwater',    label: 'Drinkwater',         emoji: '💧', always: true },
-  { key: 'tuin',          label: 'Tuin proper',        emoji: '🌿', always: true },
-  { key: 'keuken',        label: 'Keuken op orde',     emoji: '🧹', always: true },
-  { key: 'vuilbak',       label: 'Vuilbak buiten',     emoji: '🗑️', always: false, type: 'vuilbak' },
+  { key: 'ochtend',       label: 'Ochtend wandeling', emoji: '🐾', always: true, sectie: 'ochtend' },
+  { key: 'ontbijt',       label: 'Ontbijt',           emoji: '🦴', always: true, sectie: 'ochtend' },
+  { key: 'avondwandeling',label: 'Avond wandeling',    emoji: '🐾', always: true, sectie: 'avond' },
+  { key: 'avondeten',     label: 'Avondeten',          emoji: '🦴', always: true, sectie: 'avond' },
+  { key: 'drinkwater',    label: 'Drinkwater',         emoji: '💧', always: true, sectie: 'algemeen' },
+  { key: 'tuin',          label: 'Tuin proper',        emoji: '🌿', always: true, sectie: 'algemeen' },
+  { key: 'keuken',        label: 'Keuken op orde',     emoji: '🧹', always: true, sectie: 'algemeen' },
+  { key: 'vuilbak',       label: 'Vuilbak buiten',     emoji: '🗑️', always: false, type: 'vuilbak', sectie: 'algemeen' },
+];
+const SECTIES = [
+  { key: 'ochtend',  label: '🌅 Ochtend' },
+  { key: 'avond',    label: '🌙 Avond' },
+  { key: 'algemeen', label: '⚙️ Algemeen' },
 ];
 
 // Map name -> color index (0-4), persistent per session
