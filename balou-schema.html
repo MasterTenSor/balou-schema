@@ -151,13 +151,17 @@
   .day-tasks { padding: 0; }
 
   /* Sectie styling */
-  .dag-sectie { padding: 8px 14px; border-bottom: 0.5px solid rgba(45,106,79,0.08); }
+  .dag-sectie { padding: 7px 12px; border-bottom: 0.5px solid rgba(45,106,79,0.08); }
   .dag-sectie:last-child { border-bottom: none; }
-  .dag-sectie.ochtend { background: rgba(251,191,36,0.07); border-left: 3px solid #f59e0b; }
-  .dag-sectie.avond   { background: rgba(139,92,246,0.07); border-left: 3px solid #8b5cf6; }
-  .dag-sectie.algemeen{ background: rgba(107,114,128,0.06); border-left: 3px solid #9ca3af; }
-  .dag-sectie-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
-  .taak-rij { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .dag-sectie.ochtend    { background: rgba(251,191,36,0.07); border-left: 3px solid #f59e0b; }
+  .dag-sectie.avond      { background: rgba(139,92,246,0.07); border-left: 3px solid #8b5cf6; }
+  .dag-sectie.water      { background: rgba(59,130,246,0.06); border-left: 3px solid #3b82f6; }
+  .dag-sectie.thuistaken { background: rgba(107,114,128,0.05); border-left: 3px solid #9ca3af; }
+  .dag-sectie.vuilbak    { background: rgba(249,115,22,0.05); border-left: 3px solid #f97316; }
+  .dag-sectie-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 5px; }
+  .taak-rij-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .taak-rij-1 { display: grid; grid-template-columns: 1fr; gap: 5px; }
+  .taak-rij-auto { display: flex; flex-wrap: wrap; gap: 5px; }
 
   /* ---- TASK BUTTON ---- */
   .task-item { display: flex; flex-direction: column; gap: 4px; }
@@ -333,7 +337,6 @@
     margin-bottom: 16px;
     box-shadow: var(--shadow);
     box-sizing: border-box;
-    overflow: hidden;
   }
   .settings-section h2 {
     font-family: 'Nunito', sans-serif;
@@ -632,15 +635,13 @@
       <!-- Periode -->
       <div class="settings-section">
         <h2>📅 Periode</h2>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;box-sizing:border-box;overflow:hidden;">
-          <div class="form-group" style="overflow:hidden;">
-            <label class="form-label">Start datum</label>
-            <input type="date" id="s-start" class="form-input" style="width:100%;box-sizing:border-box;" onchange="onStartDateChange(this.value)">
-          </div>
-          <div class="form-group" style="overflow:hidden;">
-            <label class="form-label">Eind datum</label>
-            <input type="date" id="s-end" class="form-input" style="width:100%;box-sizing:border-box;">
-          </div>
+        <div class="form-group">
+          <label class="form-label">Start datum</label>
+          <input type="date" id="s-start" class="form-input" onchange="onStartDateChange(this.value)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Eind datum</label>
+          <input type="date" id="s-end" class="form-input">
         </div>
       </div>
 
@@ -764,19 +765,21 @@ function getDayOfWeek(str) {
 function today() { return dateStr(new Date()); }
 
 const TASKS = [
-  { key: 'ochtend',       label: 'Ochtend wandeling', emoji: '🐾', always: true, sectie: 'ochtend' },
-  { key: 'ontbijt',       label: 'Ontbijt',           emoji: '🦴', always: true, sectie: 'ochtend' },
-  { key: 'avondwandeling',label: 'Avond wandeling',    emoji: '🐾', always: true, sectie: 'avond' },
-  { key: 'avondeten',     label: 'Avondeten',          emoji: '🦴', always: true, sectie: 'avond' },
-  { key: 'drinkwater',    label: 'Drinkwater',         emoji: '💧', always: true, sectie: 'algemeen' },
-  { key: 'tuin',          label: 'Tuin proper',        emoji: '🌿', always: true, sectie: 'algemeen' },
-  { key: 'keuken',        label: 'Keuken op orde',     emoji: '🧹', always: true, sectie: 'algemeen' },
-  { key: 'vuilbak',       label: 'Vuilbak buiten',     emoji: '🗑️', always: false, type: 'vuilbak', sectie: 'algemeen' },
+  { key: 'ochtend',       label: 'Wandeling',     emoji: '🐾', always: true,  sectie: 'ochtend' },
+  { key: 'ontbijt',       label: 'Ontbijt',       emoji: '🦴', always: true,  sectie: 'ochtend' },
+  { key: 'avondwandeling',label: 'Wandeling',     emoji: '🐾', always: true,  sectie: 'avond' },
+  { key: 'avondeten',     label: 'Avondeten',     emoji: '🦴', always: true,  sectie: 'avond' },
+  { key: 'drinkwater',    label: 'Drinkwater',    emoji: '💧', always: true,  sectie: 'water' },
+  { key: 'tuin',          label: 'Tuin proper',   emoji: '🌿', always: true,  sectie: 'thuistaken' },
+  { key: 'keuken',        label: 'Keuken',        emoji: '🧹', always: true,  sectie: 'thuistaken' },
+  { key: 'vuilbak',       label: 'Vuilbak',       emoji: '🗑️', always: false, sectie: 'vuilbak', type: 'vuilbak' },
 ];
 const SECTIES = [
-  { key: 'ochtend',  label: '🌅 Ochtend' },
-  { key: 'avond',    label: '🌙 Avond' },
-  { key: 'algemeen', label: '⚙️ Algemeen' },
+  { key: 'ochtend',   label: 'Ochtend',          cols: 2 },
+  { key: 'avond',     label: 'Avond',             cols: 2 },
+  { key: 'water',     label: 'Alle dagen',        cols: 1 },
+  { key: 'thuistaken',label: 'Alle dagen',        cols: 2, hideLabel: true },
+  { key: 'vuilbak',   label: 'Vuilbak buiten',    cols: 'auto' },
 ];
 
 // Map name -> color index (0-4), persistent per session
