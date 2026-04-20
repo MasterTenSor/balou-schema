@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="Balou">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232d6a4f'/><text y='.9em' font-size='70' x='50%' dominant-baseline='middle' text-anchor='middle'>🐾</text></svg>">
 <title>Balou's Schema</title>
-  <!-- Versie: 2026-04-20 04:43 -->
+  <!-- Versie: 2026-04-20 04:55 -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap');
 
@@ -222,6 +222,7 @@
   .vuilbak-bol { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; display: block; margin: 0 auto; }
   .vuilbak-type { font-size: 9px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
   .vuilbak-naam { font-size: 9px; font-weight: 700; color: var(--green); }
+  .vuilbak-leeg { min-height: 50px; border-radius: 9px; background: rgba(0,0,0,0.03); border: 0.5px dashed rgba(0,0,0,0.08); }
 
   /* Opmerkingen */
   .remarks-item { grid-column: 1 / -1; display: flex; flex-direction: column; gap: 4px; }
@@ -361,6 +362,7 @@
   .form-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block; }
   .form-input {
     width: 100%;
+    width: -webkit-fill-available;
     max-width: 100%;
     padding: 10px 12px;
     border-radius: 9px;
@@ -373,7 +375,14 @@
     background: #fff;
     box-sizing: border-box;
     display: block;
-    max-width: 100%;
+    min-width: 0;
+  }
+  input[type="date"].form-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    width: -webkit-fill-available;
+    min-width: 0;
   }
   .form-input:focus { border-color: var(--green-light); }
 
@@ -646,13 +655,17 @@
       <!-- Periode -->
       <div class="settings-section">
         <h2>📅 Periode</h2>
-        <div class="form-group">
+        <div class="form-group" style="overflow:hidden;">
           <label class="form-label">Start datum</label>
-          <input type="date" id="s-start" class="form-input" onchange="onStartDateChange(this.value)">
+          <div style="overflow:hidden;width:100%;">
+            <input type="date" id="s-start" class="form-input" onchange="onStartDateChange(this.value)">
+          </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" style="overflow:hidden;">
           <label class="form-label">Eind datum</label>
-          <input type="date" id="s-end" class="form-input">
+          <div style="overflow:hidden;width:100%;">
+            <input type="date" id="s-end" class="form-input">
+          </div>
         </div>
       </div>
 
@@ -922,7 +935,7 @@ function renderMain() {
           allTypes.forEach(t => {
             const entry = dayEntries.find(e => (e.type || 'rest') === t);
             if (!entry) {
-              html += `<div style="min-height:50px;"></div>`;
+              html += `<div class="vuilbak-leeg"></div>`;
               return;
             }
             const idx = dayEntries.indexOf(entry);
