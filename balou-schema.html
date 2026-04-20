@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Balou's Schema</title>
+  <!-- Versie: 2026-04-20 04:26 -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600&display=swap');
 
@@ -336,7 +337,6 @@
     padding: 20px;
     margin-bottom: 16px;
     box-shadow: var(--shadow);
-    box-sizing: border-box;
   }
   .settings-section h2 {
     font-family: 'Nunito', sans-serif;
@@ -353,6 +353,7 @@
   .form-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block; }
   .form-input {
     width: 100%;
+    max-width: 100%;
     padding: 10px 12px;
     border-radius: 9px;
     border: 1.5px solid rgba(45,106,79,0.2);
@@ -363,6 +364,7 @@
     transition: border 0.2s;
     background: #fff;
     box-sizing: border-box;
+    display: block;
   }
   .form-input:focus { border-color: var(--green-light); }
 
@@ -882,48 +884,49 @@ function renderMain() {
       </div>
       <div class="day-tasks">`;
 
-    activeTasks.forEach(task => {
-      if (task.key === 'vuilbak') {
-        const dayEntries = settings.vuilbakDates.filter(x => (x.date || x) === ds);
-        const vuilbakDayData = dayData.vuilbak || {};
-        const dotColors = { rest:'#6b7280', pmd:'#3b82f6', gft:'#22c55e', papier:'#ca8a04' };
-        // One combined button per day — group all types
-        html += `<div class="task-item vuilbak-multi">
-          <div class="task-label">${task.emoji} ${task.label}</div>`;
-        dayEntries.forEach((entry, idx) => {
-          const t = entry.type || 'rest';
-          const key = `${t}_${idx}`;
-          const done = vuilbakDayData[key];
-          const dotColor = dotColors[t] || '#6b7280';
-          const typeName = t.toUpperCase();
-          html += `<button class="task-btn vuilbak-entry ${done ? 'vuilbak-done' : 'vuilbak-todo'}"
-            onclick="toggleVuilbakEntry('${ds}', '${key}', ${done ? 'true' : 'false'})">
-            <span class="vuilbak-dot" style="background:${dotColor}"></span>
-            <span>${done ? done : typeName}</span>
-          </button>`;
-        });
-        html += `</div>`;
-      } else {
-        const val = dayData[task.key];
-        const isDone = !!val;
-        const colorClass = isDone ? `color-${getNameColor(val)}` : '';
-        html += `<div class="task-item">
-          <div class="task-label">${task.emoji} ${task.label}</div>
-          <button class="task-btn ${isDone ? 'done ' + colorClass : ''}"
+    const dotColors = { rest:'#6b7280', pmd:'#3b82f6', gft:'#22c55e', papier:'#ca8a04' };
+
+    SECTIES.forEach(sectie => {
+      const sectieTaken = activeTasks.filter(t => t.sectie === sectie.key);
+      if (sectieTaken.length === 0) return;
+      const rijClass = sectie.cols === 2 ? 'taak-rij-2' : sectie.cols === 1 ? 'taak-rij-1' : 'taak-rij-auto';
+      html += `<div class="dag-sectie ${sectie.key}">`;
+      if (!sectie.hideLabel) html += `<div class="dag-sectie-label">${sectie.label}</div>`;
+      html += `<div class="${rijClass}">`;
+      sectieTaken.forEach(task => {
+        if (task.type === 'vuilbak') {
+          const dayEntries = settings.vuilbakDates.filter(x => (x.date || x) === ds);
+          const vuilbakDayData = dayData.vuilbak || {};
+          dayEntries.forEach((entry, idx) => {
+            const t = entry.type || 'rest';
+            const key = `${t}_${idx}`;
+            const done = vuilbakDayData[key];
+            const dotColor = dotColors[t] || '#6b7280';
+            const colorClass = done ? `color-${getNameColor(done)}` : '';
+            html += `<button class="task-btn vuilbak-entry ${done ? 'vuilbak-done ' + colorClass : 'vuilbak-todo'}"
+              onclick="toggleVuilbakEntry('${ds}', '${key}', ${done ? 'true' : 'false'})"
+              style="flex-direction:row;align-items:center;gap:6px;min-height:34px;padding:5px 8px;">
+              <span style="width:10px;height:10px;border-radius:50%;background:${dotColor};flex-shrink:0;display:inline-block;"></span>
+              <span style="font-size:11px;font-weight:600;">${done ? done : ''}</span>
+            </button>`;
+          });
+        } else {
+          const val = dayData[task.key];
+          const isDone = !!val;
+          const colorClass = isDone ? `color-${getNameColor(val)}` : '';
+          html += `<button class="task-btn ${isDone ? 'done ' + colorClass : ''}"
             onclick="openPopup('${ds}', '${task.key}', '${task.label}')">
-            ${isDone ? val : 'Te doen'}
-          </button>
-        </div>`;
-      }
+            <span class="taak-naam">${task.emoji} ${task.label}</span>
+            <span class="taak-waarde">${isDone ? '✓ ' + val : 'Te doen'}</span>
+          </button>`;
+        }
+      });
+      html += `</div></div>`;
     });
 
-    // Opmerkingen (read-only, only show if has content)
     const rem = dayData.opmerkingen || '';
     if (rem) {
-      html += `<div class="task-item remarks-item">
-        <div class="task-label">📝 Opmerkingen</div>
-        <div class="remarks-readonly">${rem}</div>
-      </div>`;
+      html += `<div class="dag-sectie water"><div class="dag-sectie-label">📝 Opmerkingen</div><div class="remarks-readonly">${rem}</div></div>`;
     }
 
     html += `</div></div>`;
